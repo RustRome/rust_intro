@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>Rust Intro</title>
+
+	<link rel="stylesheet" href="css/reveal.css">
+	<link rel="stylesheet" href="css/theme/black.css">
+	<link rel="stylesheet" href="css/my.css">
+
+	<!-- Theme used for syntax highlighting of code -->
+	<link rel="stylesheet" href="lib/css/zenburn.css">
+
+	<!-- Printing and PDF exports -->
+	<script>
+		var link = document.createElement('link');
+		link.rel = 'stylesheet';
+		link.type = 'text/css';
+		link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+		document.getElementsByTagName('head')[0].appendChild(link);
+	</script>
+</head>
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+			<section data-markdown="slides/intro.md" data-separator="^\n---\n$">
+
+			</section>
+		</div>
+	</div>
+
+	<script src="lib/js/head.min.js"></script>
+	<script src="js/reveal.js"></script>
+
+	<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+	 crossorigin="anonymous"></script>
+
+	<script>
+		// More info about config & dependencies:
+		// - https://github.com/hakimel/reveal.js#configuration
+		// - https://github.com/hakimel/reveal.js#dependencies
+		Reveal.initialize({
+			history: true,
+			dependencies: [
+				{ src: 'plugin/markdown/marked.js' },
+				{ src: 'plugin/markdown/markdown.js' },
+				{ src: 'plugin/notes/notes.js', async: true },
+				{ src: 'plugin/highlight/highlight.js', async: true, callback: function () { hljs.initHighlightingOnLoad(); fetchAllCode(); addButtons() } }
+			]
+		});
+
+		fetchAllCode = function () {
+			Array.prototype.slice.call(document.querySelectorAll('code[data-source]')).forEach(function (codeContainer) {
+				console.log(codeContainer.dataset.source);
+				var xhr = new XMLHttpRequest();
+				xhr.open("GET", codeContainer.dataset.source, true);
+				xhr.overrideMimeType("text/plain; charset=UTF-8");
+				xhr.onreadystatechange = function () {
+					if (xhr.readyState == 4) {
+						if (xhr.status == 200) {
+							var code = document.createTextNode(xhr.responseText);
+							codeContainer.appendChild(code);
+							if (typeof (hljs) !== 'undefined') {
+								hljs.highlightBlock(codeContainer);
+							}
+						}
+						else {
+							console.error(xhr.status)
+							console.error("Error while trying to get remote code");
+						}
+					}
+				};
+				try {
+					xhr.send(null);
+				} catch (e) {
+					console.error("XHR failed for " + url + ", " + e);
+				}
+			});
+		}
+
+		var buttons = '<button class="exec btn">run</button><button class="reset btn">reset</button>' + "\n";
+		var result = '<span class="return"></span>';
+
+		function addButtons() {
+			$('pre code.rust-interactive').each(function (i, block) {
+				$(block).before(buttons);
+				$(block).after(result);
+			});
+			$('pre code.lang-rust-interactive').each(function (i, block) {
+				$(block).before(buttons);
+				$(block).after(result);
+			});
+			$('.reset').each(function (n) {
+				$(this).context._code = $(this).siblings('code').text();
+			});
+			$('.exec').click(function () {
+				var target = $(this).siblings('.return');
+				target.html('<img src="img/rust.gif" style="border:none; box-shadow:none; margin: 0; background: none;">');
+				var code = $(this).siblings('code').text();
+				var payload = { optimize: "0", version: "stable", code: code };
+				$.ajax({
+					url: 'https://play.rust-lang.org/evaluate.json',
+					type: "POST",
+					dataType: "json",
+					data: JSON.stringify(payload),
+					contentType: "application/json"
+				}).done(function (result) {
+					var output = formatOutput(result.result);
+					console.log(result.error);
+					target.html(output);
+				});
+			});
+			$('.reset').click(function () {
+				$(this).siblings('code').text($(this).context._code);
+				hljs.highlightBlock($(this).siblings('code')[0]);
+			})
+			$('.versionable').blur(function () {
+				console.log('versioning comming soon')
+			});
+		}
+		formatOutput = function (output) {
+			var parts = output.split(/\n/);
+			return parts.join('<br>');
+		}
+
+
+
+	</script>
+</body>
+
+</html>
