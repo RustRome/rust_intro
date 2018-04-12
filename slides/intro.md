@@ -431,7 +431,71 @@ fn skip_prefix<'a>(line: &'a str, prefix: &str) -> &'a str {
 * Traits (Zero cost abstraction)
 
 
+
+
 ---
+
+## Result type
+
+<p>Exceptions do not exist in Rust </p>
+
+<pre>
+<code data-trim="hljs rust" class="lang-rust">
+
+
+enum Result&ltT, E&gt {
+    Ok(T),
+    Err(E),
+}
+
+fn main() {
+    let x : Result&lti32,&str&gt = Ok(7);
+    let y : Result&lti32,&str&gt = Err("Too bad");
+
+    match x {
+        Ok(n) => println!("{}",n),
+        Err(e) => println!("{}",e)
+    }
+}
+
+
+
+</code>
+</pre>
+
+
+---
+
+## Option type
+
+<p>Null does not exist in Rust</p>
+<pre>
+<code data-trim="hljs rust" class="lang-rust">
+
+enum Option&ltT&gt {
+	None,
+	Some(T),
+}
+
+fn main() {
+    let x = Some(7);
+    let y : Option&lti32&gt = None;
+
+
+    match x {
+        Some(n) => println!("{}",n),
+        None => println!("Not found")
+    }
+}
+
+
+
+</code>
+</pre>
+
+
+---
+
 
 ## Why together? 
 - 3D rendering
@@ -442,4 +506,8 @@ fn skip_prefix<'a>(line: &'a str, prefix: &str) -> &'a str {
 
 ---
 
-## A little NIF 
+## A Rusty NIF 
+
+
+
+
