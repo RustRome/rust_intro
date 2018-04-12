@@ -1,4 +1,133 @@
-## Rust Introduction
+# Elixir NIFs with Mozilla Rust
+
+---
+
+## Greetings
+
+---
+
+## Have we ever meet? 
+Have you ever worked with Mozilla Rust? 
+And Elixir? 
+
+---
+
+## Why Elixir? 
+* Powerful dynamic language
+* Fast learning curve
+* And...
+
+---
+
+## Because is designed for: 
+- Easy **concurrency**
+- **Fault tolerance**
+- To be **maintainable**
+- To be **scalable**
+- To help you build **distributed applications**
+
+---
+
+## HOW?! 
+Elixir runs on the Beam virtual machine
+
+---
+
+## The Beam 
+* Light-weight process
+* No memory sharing
+* Code hot-swap out of the box
+* Battle tested
+* OTP: a powerful concurrency library 
+
+---
+
+## The Supervisor tree
+<img src="../img/supervisor_tree.png"> 
+
+---
+
+## Fault Tolerance
+<img src="../img/zombies.png"/>
+
+---
+
+## Genserver 
+Genserver is abstraction around a process.
+<pre>
+<code data-trim="hljs elixir" class="lang-elixir">
+defmodule TodoList do
+  use GenServer
+end
+</code>
+</pre>
+
+---
+
+<pre>
+<code data-trim="hljs elixir" class="lang-elixir">
+defmodule Todolist do
+  use GenServer
+  
+  def start(list) do
+    GenServer.start_link(__MODULE__, list, name: __MODULE__)
+  end
+ 
+  def list_tasks() do
+    GenServer.call(__MODULE__, {:list})
+  end
+  
+  def add_task(task) do
+    GenServer.cast(__MODULE__, {:add, task})
+  end
+  
+  def handle_cast({:add, task}, list) do
+    {:noreply, [task | list]}
+  end
+  
+  def handle_call({:list}, _from, list) do
+    {:reply, list, list}
+  end
+end
+</code>
+</pre>
+
+---
+
+## What the Beam cannot do for you? 
+- Specific hardware access
+- Blowing fast sequential computation
+
+---
+
+
+## NIFs
+NIFs stands for Native Implemented Functions.  
+These are programs mostly written in C we can call from Beam.  
+Once called, a NIF takes the full control of computation,  
+run with speed of light and can do anything as native code can.  
+Sounds great but...
+
+---
+
+## How to crash the world most stable virtual machine 
+
+* Fill the *atoms* table (1 million)
+* Overflow the binary space
+* Process heap failures:
+  + Infinite recursion that spawns infinite process
+  + Super very long message queues
+  + A tons of data
+* And of course... __errors inside NIFs__
+
+
+---
+
+## So NIFs as only for superheroes?
+
+---
+
+## Why Mozilla Rust? 
 
 ---
 
@@ -11,7 +140,7 @@
 
 ---
 
-## Safe
+## Safety
 
 * Memory Safe
 * No Illegal memory access
@@ -270,8 +399,13 @@ match choice  {
 
 ---
 
-## Modern Tooling
+## Why together? 
+- 3D rendering
+- Fast decoding/encoding
+- GPU computation
+- IOT
+- Specific hardware access
 
-* Rustup
-* Cargo
-* Integrated Test
+---
+
+## A little NIF 
