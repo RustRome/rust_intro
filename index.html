@@ -82,7 +82,7 @@
 			});
 		}
 
-		var buttons = '<button class="exec btn">run</button><button class="reset btn">reset</button>' + "\n";
+		var buttons = '<button class="exec btn">run</button>' + "\n";
 		var result = '<span class="return"></span>';
 
 		function addButtons() {
@@ -99,7 +99,7 @@
 			});
 			$('.exec').click(function () {
 				var target = $(this).siblings('.return');
-				target.html('<img src="img/rust.gif" style="border:none; box-shadow:none; margin: 0; background: none;">');
+				target.html('<img src="img/rust.gif" style="border:none; box-shadow:none; margin: auto; background: none; display:block">');
 				var code = $(this).siblings('code').text();
 				var payload = { optimize: "0", version: "stable", code: code };
 				$.ajax({
