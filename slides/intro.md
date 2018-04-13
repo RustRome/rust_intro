@@ -165,44 +165,6 @@ void example() {
 
 <img src="../img/safety.png"> 
 
----
-
-
-## What Safety means?
-
-<pre>
-<code data-trim="hljs cpp" class="lang-cpp">
-// C++
-void example() {
-  vector&ltstring&gt vector;
-  …
-  auto& elem = vector[0];
-  vector.push_back(some_string);
-  cout << elem;
-}
-</code>
-</pre>
-
-<img src="../img/safety1.png"> 
-
----
-
-## What Safety means?
-
-<pre>
-<code data-trim="hljs cpp" class="lang-cpp">
-// C++
-void example() {
-  vector&ltstring&gt vector;
-  …
-  auto& elem = vector[0];
-  vector.push_back(some_string);
-  cout << elem;
-}
-</code>
-</pre>
-
-<img src="../img/safety2.png"> 
 
 ---
 
@@ -369,59 +331,6 @@ fn push_two(vec : &mut Vec&lti32&gt) {
 
 ---
 
-## Lifetimes example
-
-
-<pre>
-<code data-trim="hljs rust" class="lang-rust rust-interactive">
-
-fn main() {
-    let line = "lang:en=Hello World!";
-    let v;
-    {
-        let p = "lang:en=";
-        v = skip_prefix(line, p); 
-    }
-    println!("{}", v);
-}
-
-fn skip_prefix(line: &str, prefix: &str) -> &str {
-    let (s1,s2) = line.split_at(prefix.len());
-    s2
-}
-
-</code>
-</pre>
-
-
----
-
-## Lifetimes Fix example
-
-
-<pre>
-<code data-trim="hljs rust" class="lang-rust rust-interactive">
-
-fn main() {
-    let line = "lang:en=Hello World!";
-    let v;
-    {
-        let p = "lang:en=";
-        v = skip_prefix(line, p); 
-    }
-    println!("{}", v);
-}
-
-fn skip_prefix<'a>(line: &'a str, prefix: &str) -> &'a str {
-    let (s1,s2) = line.split_at(prefix.len());
-    s2
-}
-
-</code>
-</pre>
-
-
----
 
 ## Other Key concepts
 
@@ -653,19 +562,22 @@ extern crate image;
 use std::fs::File;
 use std::path::Path;
 use rustler::{NifEnv, NifTerm, NifResult, NifEncoder,NifError};
-
 mod atoms {
     rustler_atoms! {
         atom ok;
     }
 }
-
 rustler_export_nifs! {
     "Elixir.Image",
     [("add", 2, add),("flip", 2, flip)],
     None
 }
+fn add&lt'a&gt(env: NifEnv&lt'a&gt, args: &[NifTerm&lt'a&gt]) -> NifResult&ltNifTerm<'a&gt&gt {
+    let num1: i64 = args[0].decode()?;
+    let num2: i64 = args[1].decode()?;
 
+    Ok((atoms::ok(), num1 + num2).encode(env))
+}
 ...
 
 </code>
@@ -679,24 +591,19 @@ rustler_export_nifs! {
 
 <pre>
 <code data-trim="hljs rust" class="lang-rust long">
-
 ...
-
-fn add&lt'a&gt(env: NifEnv&lt'a&gt, args: &[NifTerm&lt'a&gt]) -> NifResult&ltNifTerm<'a&gt&gt {
-    let num1: i64 = args[0].decode()?;
-    let num2: i64 = args[1].decode()?;
-
-    Ok((atoms::ok(), num1 + num2).encode(env))
-}
 
 fn flip&lt'a&gt(env: NifEnv&lt'a&gt, args: &[NifTerm&lt'a&gt]) -> NifResult&ltNifTerm&lt'a&gt&gt {
     let input: String = args[0].decode()?;
     let output: String = args[1].decode()?;
+
     let img =
         image::open(&Path::new(&input)).map_err(|_e| NifError::Atom("Cannot open input file"))?;
+
     let filtered = img.fliph();
     let mut out =
         File::create(&Path::new(&output)).map_err(|_e| NifError::Atom("Cannot create a new file"))?;
+
     let _ = filtered
         .save(&mut out, image::PNG)
         .map_err(|_e| NifError::Atom("Cannot save new file in PNG"))?;
@@ -708,18 +615,31 @@ fn flip&lt'a&gt(env: NifEnv&lt'a&gt, args: &[NifTerm&lt'a&gt]) -> NifResult&ltNi
 
 ---
 
-## Caveats
+## Run it
 
-- Require Rust compiler
-- NIF execution time
+<pre>
+<code data-trim="hljs bash" class="lang-bash">
+~:image$ iex -S mix
+Erlang/OTP 20 [erts-9.3] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:10] [hipe] [kernel-poll:false] [dtrace]
+
+Compiling NIF crate :img (native/img)...
+   Compiling img v0.1.0 (file:///Users/enricorisa/Coding/Rust/Codemotion2018/image/native/img)
+    Finished dev [unoptimized + debuginfo] target(s) in 4.52 secs
+Interactive Elixir (1.6.4) - press Ctrl+C to exit (type h() ENTER for help)
+iex(1)> Image.flip("/Users/enricorisa/Desktop/rust-logo-blk.png","/Users/enricorisa/Desktop/test.png") 
+{:ok, "/Users/enricorisa/Desktop/test.png"}
+iex(2)>
+</code>
+</pre> 
 
 ---
 
 ## Projects with Rustler
 
-- Html5ever 
-- Juicy
-- Rox
+- Html5ever (Servo HTML5 parser)
+- Juicy (JSON parser)
+- Rox (RocksDB bindings)
+- Flower (Bloom filter)
 
 
 
