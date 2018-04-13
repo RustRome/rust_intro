@@ -47,6 +47,29 @@ Elixir runs on the Beam virtual machine
 
 ---
 
+## A simple supervisor
+<pre>
+<code data-trim="hljs elixir" class="lang-elixir">
+defmodule Flakey.Supervisor do
+  use Supervisor
+
+  def start_link do
+    Supervisor.start_link(__MODULE__, [])
+  end
+
+  def init(_) do
+    children = [
+      worker(Archive, [])
+    ]
+
+    supervise(children, [strategy: :one_for_one])
+  end
+end
+</code>
+</pre>
+
+---
+
 ## Fault Tolerance
 <img src="../img/zombies.png"/>
 
@@ -56,37 +79,53 @@ Elixir runs on the Beam virtual machine
 Genserver is abstraction around a process.
 <pre>
 <code data-trim="hljs elixir" class="lang-elixir">
-defmodule TodoList do
+defmodule Archive do
   use GenServer
-end
-</code>
-</pre>
 
----
+  def init(state), do: {:ok, state}
 
-<pre>
-<code data-trim="hljs elixir" class="lang-elixir">
-defmodule Todolist do
-  use GenServer
-  
-  def start(list) do
-    GenServer.start_link(__MODULE__, list, name: __MODULE__)
+  def handle_cast({:add, item}, state) do
+    {:noreply, internal_add_item(item, state)}
   end
- 
-  def list_tasks() do
-    GenServer.call(__MODULE__, {:list})
+
+  def handle_info({:del, key}, state) do
+    {:noreply, Map.delete(state, key)}
   end
-  
-  def add_task(task) do
-    GenServer.cast(__MODULE__, {:add, task})
+
+  def handle_cast({:add, item, ttl}, state) do
+    key = elem(Enum.at(item, 0), 0)
+    Process.send_after(__MODULE__, {:del, key}, ttl)
+    {:noreply, internal_add_item(item, state)}
   end
-  
-  def handle_cast({:add, task}, list) do
-    {:noreply, [task | list]}
+
+  defp internal_add_item(item, state) do
+    Map.merge(item, state)
   end
-  
-  def handle_call({:list}, _from, list) do
-    {:reply, list, list}
+
+  def handle_call(:list, _from, state) do
+    {:reply, state, state}
+  end
+
+
+  ### Client API
+  def start_link(state \\ %{}) do
+    GenServer.start_link(__MODULE__, state, name: __MODULE__)
+  end
+
+  def add_item(item) do
+    GenServer.cast(__MODULE__, {:add, item})
+  end
+
+  def add_item(item, ttl) do
+    GenServer.cast(__MODULE__, {:add, item, ttl})
+  end
+
+  def del_item(key) do
+    send __MODULE__, {:del, key}
+  end
+
+  def get_list do
+    GenServer.call(__MODULE__, :list)
   end
 end
 </code>
