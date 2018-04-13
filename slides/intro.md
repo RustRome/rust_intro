@@ -152,8 +152,9 @@ Sounds great but...
 
 <pre>
 <code data-trim="hljs cpp" class="lang-cpp">
+// C++
 void example() {
-  vector<string> vector;
+  vector&ltstring&gt vector;
   …
   auto& elem = vector[0];
   vector.push_back(some_string);
@@ -171,8 +172,9 @@ void example() {
 
 <pre>
 <code data-trim="hljs cpp" class="lang-cpp">
+// C++
 void example() {
-  vector<string> vector;
+  vector&ltstring&gt vector;
   …
   auto& elem = vector[0];
   vector.push_back(some_string);
@@ -189,8 +191,9 @@ void example() {
 
 <pre>
 <code data-trim="hljs cpp" class="lang-cpp">
+// C++
 void example() {
-  vector<string> vector;
+  vector&ltstring&gt vector;
   …
   auto& elem = vector[0];
   vector.push_back(some_string);
@@ -642,9 +645,8 @@ end
 
 
 <pre>
-<code data-trim="hljs rust" class="lang-rust">
+<code data-trim="hljs rust" class="lang-rust long">
 #[macro_use] extern crate rustler;
-#[allow(unused_imports)]
 #[macro_use] extern crate rustler_codegen;
 #[macro_use] extern crate lazy_static;
 extern crate image;
@@ -663,6 +665,22 @@ rustler_export_nifs! {
     [("add", 2, add),("flip", 2, flip)],
     None
 }
+
+...
+
+</code>
+</pre> 
+
+
+---
+
+## lib.rs
+
+
+<pre>
+<code data-trim="hljs rust" class="lang-rust long">
+
+...
 
 fn add&lt'a&gt(env: NifEnv&lt'a&gt, args: &[NifTerm&lt'a&gt]) -> NifResult&ltNifTerm<'a&gt&gt {
     let num1: i64 = args[0].decode()?;
@@ -687,7 +705,6 @@ fn flip&lt'a&gt(env: NifEnv&lt'a&gt, args: &[NifTerm&lt'a&gt]) -> NifResult&ltNi
 
 </code>
 </pre> 
-
 
 ---
 

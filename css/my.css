@@ -47,3 +47,7 @@
 .return {
     background-color: black
 }
+
+.reveal pre code.long {
+    max-height: 500px
+}
