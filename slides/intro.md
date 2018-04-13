@@ -509,5 +509,186 @@ fn main() {
 ## A Rusty NIF 
 
 
+---
+
+## Rustler
+
+- A library for writing NIFs in Rust
+- Handle encoding and decoding of Erlang terms (Interoperability)
+- It should never be able to crash the BEAM (safety)
+- Resource objects
+- Easy to use
+
+<p>https://github.com/hansihe/rustler</p>
+
+---
+
+## Getting Started
+</br>
+</br>
+### $ mix new image
+
+---
+
+### mix.exs
 
 
+<pre>
+<code data-trim="hljs elixir" class="lang-elixir">
+  defp deps do
+    [
+      {:rustler, "~> 0.16.0"}
+    ]
+  end
+</code>
+</pre>
+
+---
+
+
+
+<pre>
+<code data-trim="hljs bash" class="lang-bash">
+$ mix rustler.new
+==> rustler
+Compiling 2 files (.erl)
+Compiling 6 files (.ex)
+Generated rustler app
+==> image
+This is the name of the Elixir module the NIF module will be registered to.
+Module name > Image
+This is the name used for the generated Rust crate. The default is most likely fine.
+Library name (image) > img
+* creating native/img/README.md
+* creating native/img/Cargo.toml
+* creating native/img/src/lib.rs
+Ready to go! 
+
+</code>
+</pre>
+
+---
+
+## Rustler compiler
+
+<pre>
+<code data-trim="hljs elixir" class="lang-elixir">
+
+defmodule Image.MixProject do
+  use Mix.Project
+
+  def project do
+    [
+      app: :image,
+      version: "0.1.0",
+      elixir: "~> 1.6",
+      compilers: [:rustler] ++ Mix.compilers,
+      start_permanent: Mix.env() == :prod,
+      rustler_crates: rustler_crates(),
+      deps: deps()
+    ]
+  end
+
+  ...
+end
+
+</code>
+</pre>
+
+---
+
+## Crate Config
+
+<pre>
+<code data-trim="hljs elixir" class="lang-elixir">
+
+  defp rustler_crates do
+    [img: [
+      path: "native/img",
+      mode: rustc_mode(Mix.env)
+    ]]
+  end
+  defp rustc_mode(:prod), do: :release
+  defp rustc_mode(_), do: :debug
+
+</code>
+</pre>  
+
+---
+
+## Module definition
+
+
+<pre>
+<code data-trim="hljs elixir" class="lang-elixir">
+
+defmodule Image do
+  use Rustler, otp_app: :image, crate: "img"
+
+  def add(_x,_y), do: err()
+
+  defp err() do
+    throw(NifNotLoadedError)
+  end
+end
+
+
+</code>
+</pre> 
+
+---
+
+## lib.rs
+
+
+<pre>
+<code data-trim="hljs elixir" class="lang-elixir">
+#[macro_use] extern crate rustler;
+#[macro_use] extern crate rustler_codegen;
+#[macro_use] extern crate lazy_static;
+
+use rustler::{NifEnv, NifTerm, NifResult, NifEncoder};
+
+mod atoms {
+    rustler_atoms! {
+        atom ok;
+    }
+}
+
+rustler_export_nifs! {
+    "Elixir.Image",
+    [("add", 2, add)],
+    None
+}
+
+fn add&lt'a&gt(env: NifEnv&lt'a&gt, args: &[NifTerm&lt'a&gt]) -> NifResult&ltNifTerm<'a&gt&gt {
+    let num1: i64 = args[0].decode()?;
+    let num2: i64 = args[1].decode()?;
+
+    Ok((atoms::ok(), num1 + num2).encode(env))
+}
+
+</code>
+</pre> 
+
+
+---
+
+## Caveats
+
+- Require Rust compiler
+- NIF execution time
+
+---
+
+## Projects with Rustler
+
+- Html5ever 
+- Juicy
+- Rox
+
+
+
+---
+
+## Thanks
