@@ -642,7 +642,7 @@ end
 
 
 <pre>
-<code data-trim="hljs elixir" class="lang-elixir">
+<code data-trim="hljs rust" class="lang-rust">
 #[macro_use] extern crate rustler;
 #[macro_use] extern crate rustler_codegen;
 #[macro_use] extern crate lazy_static;
