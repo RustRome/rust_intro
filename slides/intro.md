@@ -320,6 +320,27 @@ fn push_two(vec : &mut Vec&lti32&gt) {
 
 ---
 
+## Safety at compile time
+
+
+<pre>
+<code data-trim="hljs rust" class="lang-rust rust-interactive">
+
+fn main() {
+    let mut vec = Vec::new();
+    vec.push(1);
+    let _elem = vec.get(0);
+    push_two(&mut vec);
+}
+
+fn push_two(vec : &mut Vec&lti32&gt) {
+    vec.push(2);
+}
+</code>
+</pre>
+
+---
+
 ## Lifetimes
 
 
