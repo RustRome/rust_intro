@@ -194,8 +194,9 @@ Sounds great but...
 // C++
 void example() {
   vector&ltstring&gt vector;
-  …
+  ...
   auto& elem = vector[0];
+  ...
   vector.push_back(some_string);
   cout << elem;
 }
@@ -599,6 +600,8 @@ defmodule Image do
 
   def add(_x,_y), do: err()
 
+  def flip(_source,_dest), do: err()
+
   defp err() do
     throw(NifNotLoadedError)
   end
@@ -670,25 +673,6 @@ fn flip&lt'a&gt(env: NifEnv&lt'a&gt, args: &[NifTerm&lt'a&gt]) -> NifResult&ltNi
     Ok((atoms::ok(), output).encode(env))
 }
 
-</code>
-</pre> 
-
----
-
-## Run it
-
-<pre>
-<code data-trim="hljs bash" class="lang-bash">
-~:image$ iex -S mix
-Erlang/OTP 20 [erts-9.3] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:10] [hipe] [kernel-poll:false] [dtrace]
-
-Compiling NIF crate :img (native/img)...
-   Compiling img v0.1.0 (file:///Users/enricorisa/Coding/Rust/Codemotion2018/image/native/img)
-    Finished dev [unoptimized + debuginfo] target(s) in 4.52 secs
-Interactive Elixir (1.6.4) - press Ctrl+C to exit (type h() ENTER for help)
-iex(1)> Image.flip("/Users/enricorisa/Desktop/rust-logo-blk.png","/Users/enricorisa/Desktop/test.png") 
-{:ok, "/Users/enricorisa/Desktop/test.png"}
-iex(2)>
 </code>
 </pre> 
 
