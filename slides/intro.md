@@ -425,8 +425,8 @@ fn skip_prefix<'a>(line: &'a str, prefix: &str) -> &'a str {
 
 ## Other Key concepts
 
-* No Exception (Result)
-* No Null (Option)
+* No Exception 
+* No Null
 * Structs
 * Enum on steroids
 * Pattern matching
