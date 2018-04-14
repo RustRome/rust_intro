@@ -6,48 +6,55 @@
 
 ---
 
-## Have we ever meet? 
-Have you ever worked with Mozilla Rust? 
-And Elixir? 
+## Have we ever meet?
+
+Have you ever worked with Mozilla Rust?
+And Elixir?
 
 ---
 
-## Why Elixir? 
+## Why Elixir?
+
 * Powerful dynamic language
 * Fast learning curve
 * And...
 
 ---
 
-## Because is designed for: 
-- Easy **concurrency**
-- **Fault tolerance**
-- To be **maintainable**
-- To be **scalable**
-- To help you build **distributed applications**
+## Because is designed for:
+
+* Easy **concurrency**
+* **Fault tolerance**
+* To be **maintainable**
+* To be **scalable**
+* To help you build **distributed applications**
 
 ---
 
-## HOW?! 
+## HOW?!
+
 Elixir runs on the Beam virtual machine
 
 ---
 
-## The Beam 
+## The Beam
+
 * Light-weight process
 * No memory sharing
 * Code hot-swap out of the box
 * Battle tested
-* OTP: a powerful concurrency library 
+* OTP: a powerful concurrency library
 
 ---
 
 ## The Supervisor tree
-<img src="../img/supervisor_tree.png"> 
+
+<img src="../img/supervisor_tree.png">
 
 ---
 
 ## A simple supervisor
+
 <pre>
 <code data-trim="hljs elixir" class="lang-elixir">
 defmodule SupervisorStore do
@@ -71,12 +78,15 @@ end
 ---
 
 ## Fault Tolerance
+
 <img src="../img/zombies.png"/>
 
 ---
 
-## Genserver 
+## Genserver
+
 Genserver is abstraction around a process.
+
 <pre>
 <code data-trim="hljs elixir" class="lang-elixir">
 defmodule Archive do
@@ -90,6 +100,7 @@ end
 ---
 
 ## Our service (process) api
+
 <pre>
 <code data-trim="hljs elixir" class="lang-elixir">
   ### Client API
@@ -123,6 +134,7 @@ end
 ---
 
 ## The internal callbacks of the GenServer
+
 <pre>
 <code data-trim="hljs elixir" class="lang-elixir">
   def init(state), do: {:ok, state}
@@ -155,17 +167,20 @@ end
 
 ## Demo time
 
-Load the Elixir repl  
+Load the Elixir repl
+
 ```bash
 iex -s MIX
 ```
 
-Run our little demo  
+Run our little demo
+
 ```
 Demo.start
 ```
 
-Let's play with our key-value store  
+Let's play with our key-value store
+
 ```
 Archive.add_item(%{test: "valore di test"})
 Archive.get_list
@@ -173,20 +188,22 @@ Archive.get_list
 ```
 
 Let's try to crash it. Supervisor will raise it up again...
+
 ```
 Archive.this_will_crash
 ```
 
 ---
 
-## What the Beam cannot do for you? 
-- Specific hardware access
-- Blowing fast sequential computation
+## What the Beam cannot do for you?
+
+* Specific hardware access
+* Blowing fast sequential computation
 
 ---
 
-
 ## NIFs
+
 NIFs stands for Native Implemented Functions.  
 These are programs mostly written in C we can call from Beam.  
 Once called, a NIF takes the full control of computation,  
@@ -195,16 +212,15 @@ Sounds great but...
 
 ---
 
-## How to crash the world most stable virtual machine 
+## How to crash the world most stable virtual machine
 
-* Fill the *atoms* table (1 million)
+* Fill the _atoms_ table (1 million)
 * Overflow the binary space
 * Process heap failures:
-  + Infinite recursion that spawns infinite process
-  + Super very long message queues
-  + A tons of data
-* And of course... __errors inside NIFs__
-
+  * Infinite recursion that spawns infinite process
+  * Super very long message queues
+  * A tons of data
+* And of course... **errors inside NIFs**
 
 ---
 
@@ -212,16 +228,15 @@ Sounds great but...
 
 ---
 
-## Why Mozilla Rust? 
+## Why Mozilla Rust?
 
 ---
 
 ### Rust is a system programming language pursuing the trifecta
 
-- Safe
-- Concurrent
-- Fast
-
+* Safe
+* Concurrent
+* Fast
 
 ---
 
@@ -249,8 +264,7 @@ void example() {
 </code>
 </pre>
 
-<img src="../img/safety.png"> 
-
+<img src="../img/safety.png">
 
 ---
 
@@ -260,8 +274,8 @@ void example() {
 Problem with safety happens when we have a resource that at the same time:
 </p>
 
-- has alias: more references to the resource
-- is mutable: someone can modify the resource
+* has alias: more references to the resource
+* is mutable: someone can modify the resource
 
 <p>
 That is (almost) the definition of data race.
@@ -283,7 +297,7 @@ That is (almost) the definition of data race.
 
 ## Fast
 
-* Safety without runtime costs 
+* Safety without runtime costs
 * LLVM optimization
 * Zero cost abstraction
 * No GC
@@ -300,15 +314,14 @@ That is (almost) the definition of data race.
 
 ## Ownership
 
-- Each resource in Rust has one owner at time.
-- When the owner goes out of scope, the resource will be dropped.
-- Ownership can be transferred
-- The owner can mutate the owned data
+* Each resource in Rust has one owner at time.
+* When the owner goes out of scope, the resource will be dropped.
+* Ownership can be transferred
+* The owner can mutate the owned data
 
 ---
 
 ### Ownership Example
-
 
 <pre>
 <code data-trim="hljs rust" class="lang-rust">
@@ -325,12 +338,9 @@ fn take(vec : Vec&lti32&gt) {
 </code>
 </pre>
 
-
 ---
 
-
 ### Ownership Example
-
 
 <pre>
 <code data-trim="hljs rust" class="lang-rust rust-interactive">
@@ -348,19 +358,17 @@ fn take(vec : Vec&lti32&gt) {
 </code>
 </pre>
 
-
 ---
 
 ## Borrowing
 
-- Express shared reference to values
-- Immutable/ Mutable references
-- Mutable references are exclusive.
+* Express shared reference to values
+* Immutable/ Mutable references
+* Mutable references are exclusive.
 
 ---
 
-## Borrowing with &T 
-
+## Borrowing with &T
 
 <pre>
 <code data-trim="hljs rust" class="lang-rust rust-interactive">
@@ -380,9 +388,7 @@ fn print(vec : &Vec&lti32&gt) {
 
 ---
 
-
-## Borrowing WITH  &mut T 
-
+## Borrowing WITH &mut T
 
 <pre>
 <code data-trim="hljs rust" class="lang-rust rust-interactive">
@@ -408,7 +414,6 @@ fn push_two(vec : &mut Vec&lti32&gt) {
 
 ## Safety at compile time
 
-
 <pre>
 <code data-trim="hljs rust" class="lang-rust rust-interactive">
 
@@ -429,28 +434,22 @@ fn push_two(vec : &mut Vec&lti32&gt) {
 
 ## Lifetimes
 
-
-- Lifetimes describe the time that values remain in memory
-- A variable's lifetime begins when it is created and ends when it is destroyed
-- In simplest cases, compiler recognize eventual problem (borrow checker) and refuse to compile.
-- In more complex scenarios compiler needs an hint.
-
+* Lifetimes describe the time that values remain in memory
+* A variable's lifetime begins when it is created and ends when it is destroyed
+* In simplest cases, compiler recognize eventual problem (borrow checker) and refuse to compile.
+* In more complex scenarios compiler needs an hint.
 
 ---
 
-
 ## Other Key concepts
 
-* No Exception 
+* No Exception
 * No Null
 * Structs
 * Enum on steroids
 * Pattern matching
 * Generics
 * Traits (Zero cost abstraction)
-
-
-
 
 ---
 
@@ -482,7 +481,6 @@ fn main() {
 </code>
 </pre>
 
-
 ---
 
 ## Option type
@@ -492,57 +490,54 @@ fn main() {
 <code data-trim="hljs rust" class="lang-rust">
 
 enum Option&ltT&gt {
-	None,
-	Some(T),
+None,
+Some(T),
 }
 
 fn main() {
-    let x = Some(7);
-    let y : Option&lti32&gt = None;
-
+let x = Some(7);
+let y : Option&lti32&gt = None;
 
     match x {
         Some(n) => println!("{}",n),
         None => println!("Not found")
     }
+
 }
-
-
 
 </code>
 </pre>
 
+---
+
+## Why together?
+
+* 3D rendering
+* Fast decoding/encoding
+* GPU computation
+* IOT
+* Specific hardware access
 
 ---
 
-
-## Why together? 
-- 3D rendering
-- Fast decoding/encoding
-- GPU computation
-- IOT
-- Specific hardware access
-
----
-
-## A Rusty NIF 
-
+## A Rusty NIF
 
 ---
 
 ## Rustler
 
-- A library for writing NIFs in Rust
-- Handle encoding and decoding of Erlang terms (Interoperability)
-- It should never be able to crash the BEAM (safety)
-- Resource objects
-- Easy to use
+* A library for writing NIFs in Rust
+* Handle encoding and decoding of Erlang terms (Interoperability)
+* It should never be able to crash the BEAM (safety)
+* Resource objects
+* Easy to use
 
 <p>https://github.com/hansihe/rustler</p>
 
 ---
 
 ## Getting Started
+
 </br>
 </br>
 ### $ mix new image
@@ -550,7 +545,6 @@ fn main() {
 ---
 
 ### mix.exs
-
 
 <pre>
 <code data-trim="hljs elixir" class="lang-elixir">
@@ -563,8 +557,6 @@ fn main() {
 </pre>
 
 ---
-
-
 
 <pre>
 <code data-trim="hljs bash" class="lang-bash">
@@ -637,7 +629,6 @@ end
 
 ## Module definition
 
-
 <pre>
 <code data-trim="hljs elixir" class="lang-elixir">
 
@@ -655,12 +646,11 @@ end
 
 
 </code>
-</pre> 
+</pre>
 
 ---
 
 ## lib.rs
-
 
 <pre>
 <code data-trim="hljs rust" class="lang-rust long">
@@ -690,13 +680,11 @@ fn add&lt'a&gt(env: NifEnv&lt'a&gt, args: &[NifTerm&lt'a&gt]) -> NifResult&ltNif
 ...
 
 </code>
-</pre> 
-
+</pre>
 
 ---
 
 ## lib.rs
-
 
 <pre>
 <code data-trim="hljs rust" class="lang-rust long">
@@ -720,18 +708,32 @@ fn flip&lt'a&gt(env: NifEnv&lt'a&gt, args: &[NifTerm&lt'a&gt]) -> NifResult&ltNi
 }
 
 </code>
-</pre> 
+</pre>
 
 ---
 
 ## Projects with Rustler
 
-- Html5ever (Servo HTML5 parser)
-- Juicy (JSON parser)
-- Rox (RocksDB bindings)
-- Flower (Bloom filter)
+* Html5ever (Servo HTML5 parser)
+* Juicy (JSON parser)
+* Rox (RocksDB bindings)
+* Flower (Bloom filter)
 
+---
 
+<div class="grid-container">
+
+<div>
+<img class="logo" src="../img/elixir.png"> 
+<h4><a href="http://elixir-roma.org">http://elixir-roma.org</a></h4>
+</div>
+<div><span class="plus">+</span></div>
+<div>
+<img class="logo" src="../img/rust.png"/> 
+<h4><a href="https://rustrome.github.io">https://rustrome.github.io</a></h4>
+</div>
+
+</div>
 
 ---
 
