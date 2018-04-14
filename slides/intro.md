@@ -50,7 +50,7 @@ Elixir runs on the Beam virtual machine
 ## A simple supervisor
 <pre>
 <code data-trim="hljs elixir" class="lang-elixir">
-defmodule Flakey.Supervisor do
+defmodule SupervisorStore do
   use Supervisor
 
   def start_link do
@@ -81,7 +81,50 @@ Genserver is abstraction around a process.
 <code data-trim="hljs elixir" class="lang-elixir">
 defmodule Archive do
   use GenServer
+  # here we declare a public api to send command to the store 
+  # and its logic to store, delete, store with ttl, retrieve the whole archive
+end
+</code>
+</pre>
 
+---
+
+## Our service (process) api
+<pre>
+<code data-trim="hljs elixir" class="lang-elixir">
+  ### Client API
+  def start_link(state \\ %{}) do
+    GenServer.start_link(__MODULE__, state, name: __MODULE__)
+  end
+
+  def add_item(item) do
+    GenServer.cast(__MODULE__, {:add, item})
+  end
+
+  def add_item(item, ttl) do
+    GenServer.cast(__MODULE__, {:add, item, ttl})
+  end
+
+  def del_item(key) do
+    send __MODULE__, {:del, key}
+  end
+
+  def get_list do
+    GenServer.call(__MODULE__, :list)
+  end
+
+  # Look this! This will crash the process. Try it! 
+  def this_will_crash do
+    send __MODULE__, {:add, 1}
+  end
+</code>
+</pre>
+
+---
+
+## The internal callbacks of the GenServer
+<pre>
+<code data-trim="hljs elixir" class="lang-elixir">
   def init(state), do: {:ok, state}
 
   def handle_cast({:add, item}, state) do
@@ -105,31 +148,34 @@ defmodule Archive do
   def handle_call(:list, _from, state) do
     {:reply, state, state}
   end
-
-
-  ### Client API
-  def start_link(state \\ %{}) do
-    GenServer.start_link(__MODULE__, state, name: __MODULE__)
-  end
-
-  def add_item(item) do
-    GenServer.cast(__MODULE__, {:add, item})
-  end
-
-  def add_item(item, ttl) do
-    GenServer.cast(__MODULE__, {:add, item, ttl})
-  end
-
-  def del_item(key) do
-    send __MODULE__, {:del, key}
-  end
-
-  def get_list do
-    GenServer.call(__MODULE__, :list)
-  end
-end
 </code>
 </pre>
+
+---
+
+## Demo time
+
+Load the Elixir repl  
+```bash
+iex -s MIX
+```
+
+Run our little demo  
+```
+Demo.start
+```
+
+Let's play with our key-value store  
+```
+Archive.add_item(%{test: "valore di test"})
+Archive.get_list
+...
+```
+
+Let's try to crash it. Supervisor will raise it up again...
+```
+Archive.this_will_crash
+```
 
 ---
 
